@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NCK Industrial — Pesagem &amp; Contagem por Peso</title>
+<style>
+  :root{
+    --bg:#0a0e1a; --panel:#121826; --panel2:#1a2233; --card:#161d2c;
+    --txt:#e6edf6; --muted:#9aa8bf; --soft:#64748b;
+    --accent:#6366f1; --accent2:#06b6d4; --amber:#f59e0b;
+    --green:#22c55e; --red:#ef4444;
+    --border:rgba(255,255,255,.09); --border2:rgba(255,255,255,.16);
+    --grad:linear-gradient(135deg,#6366f1 0%,#06b6d4 100%);
+    --grad-soft:linear-gradient(135deg,rgba(99,102,241,.18),rgba(6,182,212,.18));
+    --shadow:0 18px 50px -20px rgba(0,0,0,.7);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; background:var(--bg); color:var(--txt);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased}
+  body::before{content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(60% 50% at 80% -5%,rgba(99,102,241,.22),transparent 60%),
+      radial-gradient(55% 45% at 5% 0%,rgba(6,182,212,.16),transparent 55%),
+      radial-gradient(40% 40% at 95% 100%,rgba(245,158,11,.08),transparent 60%)}
+  a{color:var(--accent2);text-decoration:none}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+
+  header.top{display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:24px clamp(16px,4vw,52px) 20px; border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:16px}
+  .logo{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;
+    font-weight:800;letter-spacing:.5px;font-size:21px;color:#fff;
+    background:var(--grad); box-shadow:0 10px 30px -8px rgba(99,102,241,.7)}
+  .brand-title{font-size:clamp(20px,2.6vw,27px);font-weight:760;letter-spacing:-.01em}
+  .brand-sub{color:var(--muted);font-size:14px}
+  .badge{font-size:12px;color:var(--muted);border:1px solid var(--border2);padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.03);white-space:nowrap}
+
+  nav.tabs{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap;
+    padding:13px clamp(16px,4vw,52px); background:rgba(10,14,26,.85);
+    backdrop-filter:blur(12px); border-bottom:1px solid var(--border)}
+  .tab{appearance:none; cursor:pointer; font:inherit; font-size:14.5px; font-weight:600;
+    color:var(--muted); background:transparent; border:1px solid transparent;
+    padding:10px 16px; border-radius:11px; transition:.18s ease; white-space:nowrap}
+  .tab:hover{color:var(--txt); background:rgba(255,255,255,.05)}
+  .tab.active{color:#fff; background:var(--grad); box-shadow:0 8px 22px -10px rgba(99,102,241,.8)}
+
+  main{max-width:1180px; margin:0 auto; padding:clamp(22px,4vw,46px)}
+  .panel{display:none; animation:fade .5s ease both}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .kicker{display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2); margin-bottom:10px}
+  h1.hero{font-size:clamp(32px,5.4vw,52px); line-height:1.08; letter-spacing:-.02em; margin:.1em 0 .35em}
+  h1.hero .g{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+  h2{font-size:clamp(23px,3.2vw,32px); letter-spacing:-.01em; margin:0 0 .25em}
+  h3{font-size:18.5px; margin:0 0 6px}
+  p.lead{font-size:clamp(16px,1.9vw,20px); color:#d4dded; max-width:72ch}
+  p{margin:.45em 0}
+  .muted{color:var(--muted)}
+  .sect{margin:40px 0}
+
+  .grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+  .grid.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .grid.three{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{background:linear-gradient(180deg,var(--card),rgba(18,24,38,.6));
+    border:1px solid var(--border); border-radius:var(--radius); padding:22px;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease}
+  .card:hover{transform:translateY(-4px); border-color:var(--border2); box-shadow:var(--shadow)}
+  .card .ic{font-size:26px; margin-bottom:10px; display:block}
+  .card.hl{border-color:rgba(99,102,241,.5); background:var(--grad-soft)}
+  .card.dim{opacity:.62}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.04em}
+  .tag.ok{background:rgba(34,197,94,.16);color:#86efac}
+  .tag.focus{background:rgba(99,102,241,.18);color:#c7c9ff}
+  .tag.soon{background:rgba(245,158,11,.16);color:#fcd34d}
+  .tag.next{background:rgba(6,182,212,.16);color:#a5f3fc}
+
+  .stats{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); margin:30px 0}
+  .stat{background:rgba(255,255,255,.025); border:1px solid var(--border); border-radius:16px; padding:20px}
+  .num{font-size:clamp(30px,4.4vw,44px); font-weight:800; letter-spacing:-.02em; line-height:1;
+       background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lbl{color:var(--muted); font-size:13.5px; margin-top:9px}
+
+  .callout{border-left:3px solid var(--accent); background:rgba(99,102,241,.08); padding:16px 20px; border-radius:0 12px 12px 0; margin:18px 0}
+  .callout.amber{border-color:var(--amber); background:rgba(245,158,11,.09)}
+  .callout.green{border-color:var(--green); background:rgba(34,197,94,.09)}
+  table.tbl{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px}
+  table.tbl th,table.tbl td{text-align:left; padding:11px 13px; border-bottom:1px solid var(--border)}
+  table.tbl th{color:var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.04em}
+  table.tbl tr:hover td{background:rgba(255,255,255,.025)}
+  table.tbl td.r,table.tbl th.r{text-align:right; font-variant-numeric:tabular-nums}
+  table.tbl tr.tot td{font-weight:700; border-top:2px solid var(--border2); background:rgba(99,102,241,.07)}
+  ul.clean{list-style:none;padding:0;margin:10px 0}
+  ul.clean li{padding:6px 0 6px 26px; position:relative}
+  ul.clean li::before{content:"▸"; position:absolute; left:4px; color:var(--accent2)}
+  ul.check{list-style:none;padding:0;margin:14px 0 4px}
+  ul.check li{padding:7px 0 7px 30px; position:relative; font-size:14.5px}
+  ul.check li::before{content:"✓"; position:absolute; left:2px; top:6px; color:var(--green); font-weight:800; font-size:15px}
+  ul.check li b{color:var(--txt)}
+
+  .example{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:14.5px; background:#0b1020; border:1px solid var(--border); border-radius:12px; padding:16px 18px; color:#d4dded; line-height:1.95; margin:14px 0}
+  .example b{color:var(--amber)}
+  .flow{display:grid; gap:14px; margin:18px 0; counter-reset:fstep}
+  .flow .fstep{position:relative; padding:18px 20px 18px 62px; background:linear-gradient(180deg,var(--card),rgba(18,24,38,.6)); border:1px solid var(--border); border-radius:14px}
+  .flow .fstep::before{counter-increment:fstep; content:counter(fstep); position:absolute; left:18px; top:18px; width:30px; height:30px; border-radius:50%; background:var(--grad); color:#fff; font-weight:800; display:grid; place-items:center; font-size:14px}
+  .flow .fstep h3{margin:0 0 3px}
+
+  .price-grid{display:grid; gap:18px; grid-template-columns:1.6fr 1fr; margin-top:16px}
+  @media (max-width:760px){ .price-grid{grid-template-columns:1fr} }
+  .pcard{background:linear-gradient(180deg,var(--card),rgba(18,24,38,.6)); border:1px solid var(--border); border-radius:var(--radius); padding:22px}
+  .pcard.hl{border-color:rgba(99,102,241,.5); background:var(--grad-soft)}
+  .pcard .price{font-size:clamp(26px,3.4vw,34px); font-weight:800; letter-spacing:-.02em; margin:8px 0 2px;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .pcard .price small{font-size:14px; font-weight:600; color:var(--muted); -webkit-text-fill-color:var(--muted)}
+  .pcard .prazo{color:var(--muted); font-size:13.5px; margin:0 0 4px}
+  .pcard.mini{display:flex; flex-direction:column; gap:6px}
+  .pcard.mini .price{font-size:clamp(20px,2.6vw,24px); margin:4px 0 0}
+  .price-side{display:grid; gap:18px; align-content:start}
+  .price-total{margin-top:16px; display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px;
+    border-top:2px solid var(--border2); padding-top:16px; font-size:15px}
+  .price-total b{font-size:clamp(20px,2.6vw,24px)}
+
+  .steps{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin:22px 0}
+  .step{position:relative; padding:24px 20px 20px; background:linear-gradient(180deg,var(--card),rgba(18,24,38,.6)); border:1px solid var(--border); border-radius:var(--radius)}
+  .step .n{position:absolute; top:-14px; left:18px; width:30px;height:30px;border-radius:50%; background:var(--grad); color:#fff; font-weight:800; display:grid; place-items:center; font-size:14px; box-shadow:0 6px 16px -6px rgba(99,102,241,.8)}
+
+  .cta{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px;
+    background:var(--grad-soft); border:1px solid rgba(99,102,241,.4); border-radius:var(--radius); padding:26px 28px; margin-top:24px}
+  .cta b{font-size:18.5px}
+
+  footer{border-top:1px solid var(--border); padding:28px clamp(16px,4vw,52px); color:var(--muted); font-size:13.5px; text-align:center}
+  @media (max-width:560px){ body{font-size:16px} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo">NCK</div>
+    <div>
+      <div class="brand-title">Pesagem &amp; Contagem por Peso</div>
+      <div class="brand-sub">Proposta comercial · controle industrial multi-empresa</div>
+    </div>
+  </div>
+  <div class="badge">Proposta · 2026</div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab" data-target="como-funciona">Como funciona</button>
+  <button class="tab" data-target="provas">Por que confiar</button>
+  <button class="tab" data-target="investimento">Investimento</button>
+  <button class="tab" data-target="proximos">Próximos passos</button>
+</nav>
+
+<main>
+
+<!-- ============ COMO FUNCIONA ============ -->
+<section class="panel" id="como-funciona">
+  <span class="kicker">Por trás da solução</span>
+  <h2 class="reveal">Como funciona, em 3 passos</h2>
+  <p class="lead reveal">Sem complicação técnica pra você: a balança fala com um pequeno programa local, que conversa com a nuvem, que vira painel na sua mão.</p>
+  <div class="grid three reveal" style="margin-top:24px">
+    <div class="card"><span class="ic">⚖️</span><h3>1. A balança pesa</h3><p class="muted">O operador coloca as peças. O sistema lê o peso em tempo real, direto do equipamento.</p></div>
+    <div class="card"><span class="ic">🧮</span><h3>2. O sistema conta e confere</h3><p class="muted">A quantidade de peças é calculada automaticamente a partir do peso, e qualquer divergência é sinalizada na hora.</p></div>
+    <div class="card"><span class="ic">📊</span><h3>3. Você acompanha</h3><p class="muted">Os dados sobem para um painel acessível de qualquer lugar — com histórico, totais e divergências por fornecedor.</p></div>
+  </div>
+  <div class="callout reveal" style="margin-top:22px"><b>Funciona mesmo sem internet estável.</b> No cenário de campo, os dados ficam guardados no dispositivo e sincronizam automaticamente assim que a conexão volta — sem perder nem duplicar nenhuma pesagem.</div>
+
+  <div class="sect">
+    <h2 class="reveal">O fluxo, do cadastro ao acompanhamento</h2>
+    <p class="lead reveal">É o passo a passo que alinhamos com base na operação de vocês — do primeiro cadastro até o gestor acompanhando os números.</p>
+    <div class="flow reveal">
+      <div class="fstep"><h3>Cadastro da base</h3><p class="muted">O administrador cadastra fornecedores, produtos (cada um com o seu peso de referência) e os usuários que vão operar. Feito uma vez e ajustado quando precisar.</p></div>
+      <div class="fstep"><h3>Pesagem</h3><p class="muted">O operador coloca as peças na balança, espera o peso estabilizar e captura. Sem digitar quantidade na mão.</p></div>
+      <div class="fstep"><h3>Contagem automática</h3><p class="muted">Na hora da captura, o sistema calcula quantas peças há a partir do peso e registra a pesagem — com data, produto, fornecedor e operador.</p></div>
+      <div class="fstep"><h3>Conferência</h3><p class="muted">O sistema compara com o esperado e sinaliza divergência (peça faltando ou peso fora do padrão), pra você agir na hora em vez de descobrir depois.</p></div>
+      <div class="fstep"><h3>Acompanhamento</h3><p class="muted">O gestor abre o painel e vê totais, histórico e divergências por fornecedor e por período — de qualquer lugar.</p></div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2 class="reveal">Como a contagem por peso funciona</h2>
+    <p class="lead reveal">A ideia é simples: cada peça tem um peso de referência cadastrado, e o sistema divide o peso total por ele pra saber a quantidade.</p>
+    <div class="example reveal">
+      Peça de referência: <b>0,250 kg</b><br>
+      Pesou 2,485 kg → 2,485 ÷ 0,250 = 9,94 → conta <b>10 peças</b><br>
+      Pesou 2,350 kg → 2,350 ÷ 0,250 = 9,40 → conta <b>9 peças</b> (e sinaliza o desvio)
+    </div>
+    <div class="callout amber reveal"><b>Peça leve? A gente usa amostra.</b> Peças muito leves pesadas uma a uma dão imprecisão. Nesses casos, o peso de referência é obtido pesando uma amostra de várias peças e dividindo pela quantidade — assim o pequeno erro não se multiplica na contagem.</div>
+    <p class="muted reveal">A <b>tolerância</b> (o quanto de desvio dispara o alerta) é ajustável por produto e afinada com vocês no uso real — sem precisar refazer nada.</p>
+  </div>
+
+  <div class="sect">
+    <h2 class="reveal">Quem faz o quê</h2>
+    <div class="grid three reveal" style="margin-top:16px">
+      <div class="card"><span class="ic">🏢</span><h3>Administrador</h3><p class="muted">Cadastra fornecedores, produtos e usuários, e acompanha o painel da empresa. É quem organiza a base.</p></div>
+      <div class="card"><span class="ic">⚖️</span><h3>Operador</h3><p class="muted">Faz a pesagem e a contagem no dia a dia. Consulta os produtos para contar, mas não mexe nos cadastros.</p></div>
+      <div class="card"><span class="ic">🔒</span><h3>Cada empresa, seus dados</h3><p class="muted">No modelo multiempresa, cada unidade acessa e enxerga apenas as suas próprias informações — nunca as de outra.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ POR QUE CONFIAR ============ -->
+<section class="panel" id="provas">
+  <span class="kicker">Não é chute</span>
+  <h2 class="reveal">A parte de maior risco já foi testada</h2>
+  <p class="lead reveal">Antes de propor prazo e preço, validamos na prática os pontos que normalmente travam um projeto como esse.</p>
+  <div class="grid two reveal" style="margin-top:20px">
+    <div class="card hl"><span class="ic">✅</span><h3>Comunicação com a balança</h3><p class="muted">Testamos a leitura em tempo real com uma balança real, com reconexão automática caso a rede falhe. Esse era o maior risco técnico do projeto — e já está resolvido.</p></div>
+    <div class="card hl"><span class="ic">🔁</span><h3>Sincronização sem duplicar</h3><p class="muted">Cada pesagem nasce com um identificador único, por desenho — mesmo reenviando dados depois de ficar offline, nada duplica e nada se perde. Validamos isso já na primeira entrega, com a sua operação real.</p></div>
+    <div class="card hl"><span class="ic">📐</span><h3>Regra de contagem testada</h3><p class="muted">O cálculo de quantidade por peso já foi testado na prática numa balança real — inclusive o tratamento de peças leves via amostragem. Ainda em ambiente controlado, não no seu chão de fábrica: a validação com a sua equipe e o seu equipamento acontece logo no início da primeira entrega.</p></div>
+    <div class="card hl"><span class="ic">🏗️</span><h3>Arquitetura pensada para crescer</h3><p class="muted">Multi-empresa e controle de acesso por perfil já fazem parte do desenho desde a primeira fase — não são retrabalho futuro.</p></div>
+  </div>
+  <div class="callout green reveal" style="margin-top:22px"><b>Resultado:</b> um escopo enxuto e defensável, que cobre os dois cenários de operação com um só sistema — sem inflar prazo nem preço, com o ponto de maior risco técnico já testado e a validação com a sua operação prevista para a primeira entrega.</div>
+</section>
+
+<!-- ============ INVESTIMENTO ============ -->
+<section class="panel" id="investimento">
+  <span class="kicker">Como fechamos</span>
+  <h2 class="reveal">Investimento</h2>
+  <p class="lead reveal">Preço fechado por fase, só quando o escopo dela está claro — você sabe exatamente quanto paga em cada entrega, sem cheque em aberto.</p>
+
+  <div class="stats">
+    <div class="stat reveal"><div class="num"><span>~R$ </span><span class="counter" data-target="27430">0</span></div><div class="lbl">investimento do MVP já utilizável</div></div>
+    <div class="stat reveal"><div class="num"><span>~R$ </span><span class="counter" data-target="44180">0</span></div><div class="lbl">estimativa do projeto completo</div></div>
+    <div class="stat reveal"><div class="num"><span>~</span><span class="counter" data-target="40">0</span><span> dias</span></div><div class="lbl">prazo estimado do MVP no ar (a partir da assinatura)</div></div>
+  </div>
+
+  <div class="sect">
+    <h2 class="reveal">Preço por entrega</h2>
+    <div class="price-grid reveal">
+      <div class="pcard hl">
+        <span class="tag focus">1ª entrega · MVP</span>
+        <span class="tag next" style="margin-left:6px">~40 dias</span>
+        <div class="price">~R$ 27.430</div>
+        <p class="prazo">Sistema completo e usável já na primeira entrega. Tudo isto incluso:</p>
+        <ul class="check">
+          <li><b>Balança fixa, estável e online</b> — leitura ao vivo, conectada à internet da fábrica</li>
+          <li><b>Contagem automática por peso</b> — calcula a quantidade de peças e sinaliza divergência na hora</li>
+          <li><b>Registro auditável</b> — cada pesagem fica gravada e rastreável</li>
+          <li><b>Cadastros completos</b> — fornecedores, produtos e unidades (criar, editar, consultar e remover)</li>
+          <li><b>Multiempresa</b> — cada unidade acessa e enxerga só os seus próprios dados</li>
+          <li><b>Cadastro e controle de usuários</b> — acesso por papel (administrador e operador)</li>
+        </ul>
+      </div>
+      <div class="price-side">
+        <div class="pcard mini">
+          <span class="tag next">2ª entrega</span>
+          <h3>Validação técnica — campo</h3>
+          <p class="prazo">Prova de funcionamento offline + sincronização, antes de fechar a fase seguinte.</p>
+          <div class="price">~R$ 2.300</div>
+        </div>
+        <div class="pcard mini">
+          <span class="tag soon">3ª entrega</span>
+          <h3>Painel e operação em campo</h3>
+          <p class="prazo">Dashboard, relatórios e sincronização da balança em campo. Estimativa, confirmada após a validação técnica.</p>
+          <div class="price">~R$ 14.450</div>
+        </div>
+      </div>
+    </div>
+    <div class="price-total reveal">
+      <span class="muted">Total estimado do projeto completo (as três entregas)</span>
+      <b>~R$ 44.180</b>
+    </div>
+    <p class="muted reveal" style="font-size:13.5px; margin-top:12px">Valores de planejamento para o projeto completo, com variação esperada de ±15–20% até o fechamento de cada fase. O MVP e a validação técnica têm preço fechado; a última fase é confirmada após a etapa de validação.</p>
+  </div>
+
+  <div class="sect">
+    <h2 class="reveal">Como funciona o pagamento</h2>
+    <ul class="clean reveal">
+      <li><b>40%</b> na assinatura, pra início da fase.</li>
+      <li><b>30%</b> quando apresentarmos o MVP pronto e você aprovar a entrega.</li>
+      <li><b>30%</b> no aceite final, com o sistema em uso na sua operação.</li>
+      <li>Mudança de escopo dentro de uma fase já fechada entra por aditivo, combinado antes de começar.</li>
+    </ul>
+  </div>
+
+  <div class="sect">
+    <h2 class="reveal">Custos após a entrega</h2>
+    <p class="lead reveal">Fora o valor do projeto, existem os custos de manter o sistema no ar depois de entregue. São separados e transparentes — sem surpresa.</p>
+    <div class="grid three reveal" style="margin-top:16px">
+      <div class="card hl"><span class="ic">🎁</span><h3>2 primeiros meses por nossa conta</h3><p class="muted">Nos 2 primeiros meses após a entrega do MVP, o servidor e o domínio ficam por nossa conta. Você usa o sistema em operação real sem custo de infraestrutura nesse período.</p></div>
+      <div class="card"><span class="ic">☁️</span><h3>Infraestrutura — cerca de R$ 150 a R$ 200/mês</h3><p class="muted">Passado esse período, o custo de infraestrutura (servidor + domínio) passa a ser do cliente, na faixa de <b>R$ 150 a R$ 200 por mês</b>. É o custo de manter o sistema no ar, sem margem embutida.</p></div>
+      <div class="card"><span class="ic">🛠️</span><h3>Manutenção — só se precisar</h3><p class="muted">Não é mensalidade fixa: só existe quando houver um <b>problema pra corrigir</b> ou uma <b>melhoria/novo recurso</b> que você pedir. Nesses casos é cobrada <b>à parte e por hora</b>, sempre orçada e aprovada por você antes de começar. Mês sem demanda, mês sem custo de manutenção. O valor da hora será combinado no início das manutenções, após a entrega da fase 3.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRÓXIMOS PASSOS ============ -->
+<section class="panel" id="proximos">
+  <span class="kicker">Vamos começar?</span>
+  <h2 class="reveal">Próximos passos</h2>
+  <p class="lead reveal">Do seu "sim" ao sistema rodando na sua operação, em quatro passos — o MVP no ar em ~40 dias.</p>
+  <div class="steps reveal">
+    <div class="step"><span class="n">1</span><h3>Você aprova a proposta</h3><p class="muted">Confirma o escopo e o valor do MVP — preço fechado, sem cheque em aberto.</p></div>
+    <div class="step"><span class="n">2</span><h3>Assinatura + 40%</h3><p class="muted">A assinatura e o sinal de 40% dão a largada no desenvolvimento.</p></div>
+    <div class="step"><span class="n">3</span><h3>~40 dias construindo, você acompanhando</h3><p class="muted">Construímos o MVP com você a par do progresso. Quando entregamos pronto e você aprova, entram os 30% seguintes.</p></div>
+    <div class="step"><span class="n">4</span><h3>No ar, e aceite final</h3><p class="muted">Você usa o MVP na sua operação real. No aceite, os 30% restantes — e decidimos juntos a próxima fase.</p></div>
+  </div>
+  <div class="cta reveal">
+    <div><b>Pronto pra contar peças sem erro e sem papel?</b><div class="muted" style="margin-top:6px">Dúvida de escopo, prazo ou investimento? É só chamar — a gente responde.</div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  NCK Industrial · pesagem &amp; contagem por peso · proposta comercial · 2026
+</footer>
+
+<script>
+(function(){
+  var tabs   = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('shown'); io.unobserve(e.target); } });
+  }, {threshold:0.10});
+  function revealIn(scope){
+    Array.prototype.slice.call(scope.querySelectorAll('.reveal:not(.shown)')).forEach(function(el,i){
+      el.style.transitionDelay = (i % 6) * 70 + 'ms'; io.observe(el);
+    });
+  }
+  function fmtBR(val, dec){
+    var parts = val.toFixed(dec).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return dec > 0 ? parts.join(',') : parts[0];
+  }
+  function animateCounters(scope){
+    Array.prototype.slice.call(scope.querySelectorAll('.counter:not(.done)')).forEach(function(el){
+      el.classList.add('done');
+      var target = parseFloat(el.getAttribute('data-target')) || 0;
+      var suffix = el.getAttribute('data-suffix') || '';
+      var dec    = parseInt(el.getAttribute('data-dec') || '0', 10);
+      var dur = 1100, start = null;
+      function step(ts){
+        if(!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var val = target * (0.5 - Math.cos(Math.PI * p) / 2);
+        el.textContent = fmtBR(val, dec) + suffix;
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  function activate(id){
+    tabs.forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-target') === id); });
+    panels.forEach(function(p){ p.classList.toggle('active', p.id === id); });
+    var panel = document.getElementById(id); if(!panel) return;
+    revealIn(panel); animateCounters(panel);
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ activate(t.getAttribute('data-target')); }); });
+
+  var initial=(location.hash||'').replace('#','');
+  var valid=tabs.some(function(t){ return t.getAttribute('data-target')===initial; });
+  activate(valid ? initial : 'como-funciona');
+})();
+</script>
+</body>
+</html>
